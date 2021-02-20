@@ -27,10 +27,9 @@ export const RootHandler = (
       if (!req.url) {
         return
       }
-      const urlParts = url.parse(req.url || "")
-      const handler = fp.get(
-        [urlParts.pathname || "", req.method || ""])
-      (routeLookup);
+      const urlParts = url.parse(req.url || "");
+      const key = `${urlParts.pathname}.${req.method}`;
+      const handler = fp.get(key)(routeLookup);
       if (!handler) {
         return textRespond(res, 401, "Not Found");
       }
