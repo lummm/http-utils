@@ -1,5 +1,6 @@
 import { ResponseType, Res } from "../@types";
 
+
 const getResponseHeaders = (
   responseType: ResponseType,
 ) => ({

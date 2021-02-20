@@ -9,8 +9,6 @@ type RouteDefiner = (
 ) => void;
 
 
-
-
 export const Routes = (): {
   get: RouteDefiner,
   put: RouteDefiner,
