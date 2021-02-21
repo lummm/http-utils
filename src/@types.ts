@@ -1,10 +1,12 @@
 import http from "http";
 
 
-export type Req = http.IncomingMessage;
+export interface Req extends http.IncomingMessage {
+  body?: any;
+};
 export type Res = http.ServerResponse;
 // a CB can return null to stop the handle flow
-export type CB = (req: Req, res: Res) => Promise<[Req, Res] | void>;
+export type CB = (req: Req, res: Res) => Promise<[Req, Res] | void | null>;
 
 export type RouteConf = {
   path: string;

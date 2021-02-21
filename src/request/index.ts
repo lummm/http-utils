@@ -1,8 +1,11 @@
-import { Req } from "../@types";
+import fp from "lodash/fp";
+
+import { Req, Res, CB } from "../@types";
 import { MAX_BODY_SIZE } from "../constants";
+import { textRespond } from "../response";
 
 
-export const readBodyStr = (req: Req): Promise<string> => {
+const getBodyStr = (req: Req): Promise<string> => {
   return new Promise((resolve, reject) => {
     const read: string[] = [];
     let totalSize = 0;
@@ -18,6 +21,34 @@ export const readBodyStr = (req: Req): Promise<string> => {
   });
 };
 
-export const readBodyJson = async (req: Req) => JSON.parse(
-  await readBodyStr(req)
+const getBodyJson = async (req: Req) => JSON.parse(
+  await getBodyStr(req)
 );
+
+
+export const readBody = ({
+  asJson = true,
+  ensureKeys = [],
+}: {
+  asJson?: boolean;
+  ensureKeys?: string[],
+}): CB => async (
+  req: Req,
+  res: Res,
+) => {
+  const body = asJson
+    ? await getBodyJson(req)
+    : await getBodyStr(req);
+  if (asJson && ensureKeys.length) {
+    const missingKeys = fp.difference(ensureKeys)(Object.keys(body));
+    if (missingKeys.length) {
+      const errMsg = "missing required body props -> "
+        + missingKeys
+          .map(key => `"${key}"`)
+          .join(", ");
+      console.error(errMsg)
+      return textRespond({res, status: 400, body: errMsg});
+    }
+  }
+  return [{...req, body} as Req, res];
+};

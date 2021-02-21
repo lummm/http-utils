@@ -1,4 +1,4 @@
-import { App, jsonRespond, Downstream, readBodyStr } from "http-utils";
+import { App, jsonRespond, Downstream, readBody } from "http-utils";
 import { Req, Res } from "http-utils/lib/@types";
 
 
@@ -23,13 +23,12 @@ app.routes.GET("/test-zmq", async (req: Req, res: Res) => {
 app.routes
   .POST(
     "/test-post",
+    readBody({
+      ensureKeys: ["hi"],
+    }),
     async (req: Req, res: Res) => {
-      console.log("middleware");
-      return [req, res];
-    },
-    async (req: Req, res: Res) => {
-      const body = await readBodyStr(req);
-      console.log("body", body);
+      const {body} = req;
+      console.log("body", body["hi"]);
       return jsonRespond({res, body: "OK"});
     });
 
