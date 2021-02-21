@@ -4,6 +4,7 @@ import asyncio
 import json
 import random
 import string
+import time
 
 import aiohttp
 
@@ -39,8 +40,12 @@ async def main():
     with open("requests.txt", "w") as f:
         f.write("\n".join(payloads))
     async with aiohttp.ClientSession() as client:
+        t0 = time.time()
+        print("doing requests")
         await asyncio.gather(
             *[req(client, data) for data in test_data])
+        t1 = time.time()
+        print(t1 - t0)
         await req(client, json.dumps({
             "topic": "STOP",
             "payload": ""
