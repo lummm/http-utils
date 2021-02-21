@@ -15,10 +15,16 @@ app.routes.GET(
     return jsonRespond({res, body: "OK"});
   });
 
-app.routes.GET("/test-zmq", async (req: Req, res: Res) => {
-  Downstream.sendDownstream(["test", "frames"]);
-  return jsonRespond({res, body: "OK"});
-});
+app.routes.POST(
+  "/test-zmq",
+  readBody({
+    ensureKeys: ["topic", "payload"],
+  }),
+  async (req: Req, res: Res) => {
+    const { topic, payload } = req.body;
+    await Downstream.sendDownstream([topic, payload]);
+    return jsonRespond({res, body: "OK"});
+  });
 
 app.routes
   .POST(

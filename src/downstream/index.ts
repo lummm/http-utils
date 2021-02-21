@@ -11,10 +11,11 @@ export interface DownstreamService {
 
 
 const getPushSocket = async (
+  host: string,
   port: number,
 ): Promise<Push> => {
   const push = new Push();
-  await push.bind(`tcp://0.0.0.0:${port}`);
+  push.connect(`tcp://${host}:${port}`);
   return push;
 }
 
@@ -23,11 +24,7 @@ const downstreamSendFactory = (
   push: Push,
 ) => async (
   frames: string[]
-): Promise<void> => {
-  await push.send(frames);
-  return;
-};
-
+): Promise<void> => push.send(frames);
 
 export const Downstream: DownstreamService = {
   sendDownstream: () => Promise.resolve(),
@@ -35,7 +32,9 @@ export const Downstream: DownstreamService = {
 
 export const initDownstreamService = async (
   port: number,
+  host: string = "127.0.0.1",
 ) => {
-  const socket = await getPushSocket(port);
+  const socket = await getPushSocket(host, port);
   Downstream.sendDownstream = downstreamSendFactory(socket);
+  console.log("downstream bound to", host, port);
 };

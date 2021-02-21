@@ -12,10 +12,8 @@ export const App = () => {
       downstreamPort: number,
     ) => {
       await initDownstreamService(downstreamPort);
-      console.log("downstream bound to", downstreamPort);
       const rootHandler = RootHandler(routes.list());
       const server = Server(rootHandler);
-      console.log("starting server on", listenPort);
       return server.run(listenPort);
     },
   };
