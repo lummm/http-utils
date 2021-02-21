@@ -4,13 +4,16 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
+    "run": "ts-node ./main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "http-utils": "git+ssh://github.com/tengelisconsulting/http-utils.git#a3d4324",
-    "ts-node": "^9.1.1"
+    "@types/node": "^14.14.31",
+    "http-utils": "file:..",
+    "ts-node": "^9.1.1",
+    "zeromq": "^6.0.0-beta.6"
   }
 }

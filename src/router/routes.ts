@@ -1,4 +1,3 @@
-
 import { CB, RouteConf } from "../@types";
 import { Method } from "../constants";
 
@@ -8,16 +7,18 @@ type RouteDefiner = (
   cb: CB
 ) => void;
 
-
-export const Routes = (): {
-  get: RouteDefiner,
-  put: RouteDefiner,
-  post: RouteDefiner,
+export interface RoutesDef {
+  GET: RouteDefiner,
+  POST: RouteDefiner,
+  PUT: RouteDefiner,
   list: () => RouteConf[],
-} => {
+}
+
+
+export const Routes = (): RoutesDef => {
   const routes: RouteConf[] = [];
   const api = Object.values(Method).reduce((acc, method: string) => {
-    acc[method.toLowerCase()] = (path: string, cb: CB) => {
+    acc[method] = (path: string, cb: CB) => {
       routes.push({path, method, cb});
     };
     return acc;

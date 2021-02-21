@@ -7,10 +7,10 @@ import { Routes } from "../routes";
 describe("routes", () => {
   it("should correctly define routes", () => {
     const routes = Routes();
-    routes.get("/test-1", (res, req) => {
+    routes.GET("/test-1", (res, req) => {
       return "test 1";
     });
-    routes.get("/test-2", (res, req) => {
+    routes.GET("/test-2", (res, req) => {
       return "test 2";
     });
     const defs = routes.list();

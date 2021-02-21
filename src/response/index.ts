@@ -17,11 +17,15 @@ const getResBody = (
 
 const respond = (
   responseType: ResponseType = "text",
-) => (
+) => ({
+  res,
+  body,
+  status = 200,
+}: {
   res: Res,
-  status: number,
   body: any,
-): void => {
+  status?: number,
+}): void => {
   const toBody = getResBody(responseType);
   res.writeHead(status, getResponseHeaders(responseType));
   res.write(toBody(body));

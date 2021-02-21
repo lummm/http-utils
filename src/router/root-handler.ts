@@ -8,6 +8,7 @@ import { RouteConf, CB, Req, Res } from "../@types";
 import { Method } from "../constants";
 import { textRespond } from "../response";
 
+
 interface RouteLookup {
   [index: string]: {
     [index in Method]: CB;
@@ -31,15 +32,12 @@ export const RootHandler = (
       const key = `${urlParts.pathname}.${req.method}`;
       const handler = fp.get(key)(routeLookup);
       if (!handler) {
-        return textRespond(res, 401, "Not Found");
+        return textRespond({res, status: 401, body: "Not Found"});
       }
-      const response = await handler(req, res);
-      return textRespond(
-        res, 200, response
-      );
+      await handler(req, res);
     } catch (e) {
       console.trace(e);
-      return textRespond(res, 500, "Server Error");
+      return textRespond({res, status: 500, body: "Server Error"});
     }
   };
 }

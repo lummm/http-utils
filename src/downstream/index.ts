@@ -3,7 +3,7 @@
  * we provide an 'init' method to initialize the
  * global service.
 */
-import zmq from "zeromq";
+import { Push } from "zeromq";
 
 interface DownstreamService {
   sendDownstream: (frames: string[]) => Promise<void>;
@@ -12,15 +12,15 @@ interface DownstreamService {
 
 const getPushSocket = async (
   port: number,
-): Promise<zmq.Push> => {
-  const push = new zmq.Push();
-  await push.bind(`tcp://0.0.0.0:{port}`);
+): Promise<Push> => {
+  const push = new Push();
+  await push.bind(`tcp://0.0.0.0:${port}`);
   return push;
 }
 
 
 const downstreamSendFactory = (
-  push: zmq.Push,
+  push: Push,
 ) => async (
   frames: string[]
 ): Promise<void> => {
