@@ -20,3 +20,4 @@ export const App = () => {
 };
 
 export { textRespond, jsonRespond } from "./response";
+export { Downstream } from "./downstream";

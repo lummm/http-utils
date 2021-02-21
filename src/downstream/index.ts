@@ -5,7 +5,7 @@
 */
 import { Push } from "zeromq";
 
-interface DownstreamService {
+export interface DownstreamService {
   sendDownstream: (frames: string[]) => Promise<void>;
 }
 
