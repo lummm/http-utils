@@ -33,7 +33,7 @@ export const Downstream: DownstreamService = {
   sendDownstream: () => Promise.resolve(),
 };
 
-export const init = async (
+export const initDownstreamService = async (
   port: number,
 ) => {
   const socket = await getPushSocket(port);
