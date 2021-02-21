@@ -12,8 +12,10 @@ export const App = () => {
       downstreamPort: number,
     ) => {
       await initDownstreamService(downstreamPort);
+      console.log("downstream boudn to", downstreamPort);
       const rootHandler = RootHandler(routes.list());
       const server = Server(rootHandler);
+      console.log("starting server on", listenPort);
       return server.run(listenPort);
     },
   };
@@ -21,3 +23,4 @@ export const App = () => {
 
 export { textRespond, jsonRespond } from "./response";
 export { Downstream } from "./downstream";
+export { readBodyStr } from "./request";

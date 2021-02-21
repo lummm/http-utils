@@ -19,9 +19,9 @@ interface RouteLookup {
 export const RootHandler = (
   routes: RouteConf[]
 ): CB => {
-  const routeLookup: RouteLookup = fp.reduce(
-    (acc, {path, method, cb}) => fp.set([path, method], cb)(acc),
-    {})(routes);
+  const routeLookup: RouteLookup = routes.reduce(
+    (acc, {path, method, cbs}) => fp.set([path, method], cbs)(acc),
+    {});
 
   return async (req: Req, res: Res) => {
     try {
@@ -30,11 +30,22 @@ export const RootHandler = (
       }
       const urlParts = url.parse(req.url || "");
       const key = `${urlParts.pathname}.${req.method}`;
-      const handler = fp.get(key)(routeLookup);
-      if (!handler) {
+      const handlers: CB[] = fp.get(key)(routeLookup);
+      if (!handlers) {
         return textRespond({res, status: 401, body: "Not Found"});
       }
-      await handler(req, res);
+      // This establishes the middleware flow.
+      // Imperative to allow early breaks.
+      let workingReq = req;
+      let workingRes = res;
+      for (let handler of handlers) {
+        const stepResult = await handler(workingReq, workingRes);
+        if (!stepResult) {
+          // we terminate early
+          break;
+        }
+        [workingReq, workingRes] = stepResult;
+      }
     } catch (e) {
       console.trace(e);
       return textRespond({res, status: 500, body: "Server Error"});

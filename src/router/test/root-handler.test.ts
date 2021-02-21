@@ -1,4 +1,5 @@
 import { RootHandler } from "../root-handler";
+import { textRespond } from "../../response";
 
 
 describe("root-handler", () => {
@@ -6,12 +7,12 @@ describe("root-handler", () => {
     {
       path: "/test-1",
       method: "GET",
-      cb: async (req, res) => 1,
+      cbs: [async (req, res) => textRespond({res, body: "1"})],
     },
     {
       path: "/test-2",
       method: "POST",
-      cb: async (req, res) => 2,
+      cbs: [async (req, res) => textRespond({res, body: "2"})],
     },
   ]);
   const getMockReq = (method: string, url: string): any => ({
@@ -30,7 +31,7 @@ describe("root-handler", () => {
     const mockReq = getMockReq("GET", "/test-1");
     const mockRes = getMockRes();
     await rootHandler(mockReq, mockRes);
-    expect(mockRes.write).toHaveBeenCalledWith(1);
+    expect(mockRes.write).toHaveBeenCalledWith("1");
     const [status, _headers] = mockRes.writeHead.mock.calls[0];
     expect(status).toEqual(200);
   });
@@ -39,7 +40,7 @@ describe("root-handler", () => {
     const mockReq = getMockReq("POST", "/test-2");
     const mockRes = getMockRes();
     await rootHandler(mockReq, mockRes);
-    expect(mockRes.write).toHaveBeenCalledWith(2);
+    expect(mockRes.write).toHaveBeenCalledWith("2");
     const [status, _headers] = mockRes.writeHead.mock.calls[0];
     expect(status).toEqual(200);
   });
