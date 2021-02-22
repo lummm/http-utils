@@ -1,59 +1,65 @@
-import { Push } from "zeromq";
+import { Dealer } from "zeromq";
 import fp from "lodash/fp";
 
-import { DEFAULT_N_SOCKETS } from "../constants";
+
+type DSSocket = Dealer;
 
 
 interface State {
-  availablePush: Push[];
-  waiting: null | ((socket: Push) => void);
+  availableSockets: DSSocket[];
+  waiting: null | ((socket: DSSocket) => void);
 }
 
 const state: State = {
-  availablePush: [],
+  availableSockets: [],
   waiting: null,
 };
 
 
-const createPushSocket = async (
+const createDSSocket = async (
   host: string,
   port: number,
-): Promise<Push> => {
-  const push = new Push();
-  push.connect(`tcp://${host}:${port}`);
-  return push;
+): Promise<DSSocket> => {
+  const socket = new Dealer();
+  socket.connect(`tcp://${host}:${port}`);
+  return socket;
 }
 
 export const initSockets = async (
   host: string,
   port: number,
+  nSockets: number
 ) => {
-  console.log("connecting sockets ->", DEFAULT_N_SOCKETS);
-  state.availablePush = await Promise.all(
-    fp.range(0, DEFAULT_N_SOCKETS)
-      .map((_) => createPushSocket(host, port))
+  console.log(
+    "connecting ",
+    nSockets,
+    " to ", host, port
+  );
+  state.availableSockets = await Promise.all(
+    fp.range(0, nSockets)
+      .map((_) => createDSSocket(host, port))
   );
 };
 
-// this returns an available push socket
-export const getPushSocket = async (): Promise<Push> => {
+// this returns an available downstream socket
+export const getDSSocket = async (): Promise<Dealer> => {
   return new Promise((resolve, reject) => {
-    if (state.availablePush.length > 0) {
-      const socket = state.availablePush.pop();
-      resolve(socket as Push);
+    if (state.availableSockets.length > 0) {
+      const socket = state.availableSockets.pop();
+      resolve(socket as DSSocket);
     }
     // else we wait
-    state.waiting = (socket: Push) => {
+    state.waiting = (socket: DSSocket) => {
       state.waiting = null;
       resolve(socket);
     };
   })
 }
 
-export const returnPushSocket = (
-  socket: Push
+export const returnDSSocket = (
+  socket: DSSocket
 ): void => {
-  state.availablePush.push(socket);
+  state.availableSockets.push(socket);
   if (state.waiting) {
     state.waiting(socket);
   }

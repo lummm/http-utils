@@ -22,7 +22,9 @@ app.routes.POST(
   }),
   async (req: Req, res: Res) => {
     const { topic, payload } = req.body;
+    // console.log("got", payload);
     await Downstream.sendDownstream([topic, payload]);
+    // console.log("sent", payload);
     return jsonRespond({res, body: "OK"});
   });
 
@@ -38,4 +40,7 @@ app.routes
       return jsonRespond({res, body: "OK"});
     });
 
-app.start(8888, 9999);
+const listen = parseInt(process.env["LISTEN"] as string);
+const downstream = parseInt(process.env["DS"] as string);
+
+app.start(listen, downstream, "127.0.0.1");

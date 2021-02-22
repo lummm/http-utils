@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 import random
 import string
 import time
@@ -11,9 +12,11 @@ import aiohttp
 
 letters = string.ascii_lowercase
 
+PORT = int(os.environ["PORT"])
+url = f"http://localhost:{PORT}/test-zmq"
 
 async def req(client, data):
-    async with client.post("http://localhost:8888/test-zmq", data=data) as resp:
+    async with client.post(url, data=data) as resp:
         return
     return
 
@@ -46,10 +49,6 @@ async def main():
             *[req(client, data) for data in test_data])
         t1 = time.time()
         print(t1 - t0)
-        await req(client, json.dumps({
-            "topic": "STOP",
-            "payload": ""
-        }))
     return
 
 

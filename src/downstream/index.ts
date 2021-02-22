@@ -1,4 +1,4 @@
-import { initSockets, getPushSocket, returnPushSocket } from "./zmq";
+import { initSockets, getDSSocket, returnDSSocket } from "./zmq";
 
 /**
  * To allow for using this module directly,
@@ -6,11 +6,11 @@ import { initSockets, getPushSocket, returnPushSocket } from "./zmq";
  * global service.
  */
 const sendDownstream = async (frames: string[]) => {
-  const push = await getPushSocket();
+  const push = await getDSSocket();
   try {
     await push.send(frames);
   } finally {
-    returnPushSocket(push);
+    returnDSSocket(push);
   }
   return;
 };
@@ -26,8 +26,10 @@ export const Downstream: DownstreamService = {
 
 export const initDownstreamService = async (
   port: number,
-  host: string = "127.0.0.1",
+  host: string,
+  nSockets: number
 ) => {
-  await initSockets(host, port);
-  console.log("downstream bound to", host, port);
+  await initSockets(host, port, nSockets);
 };
+
+export { runBridge } from "./bridge";
