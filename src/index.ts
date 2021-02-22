@@ -10,17 +10,22 @@ export const App = () => {
     routes,
     start: async (
       listenPort: number,
-      downstreamPort: number,
-      downstreamHost: string,
+      downstreamPort?: number,
+      downstreamHost?: string,
       {
         nSockets,
       } = {
         nSockets: DEFAULT_N_SOCKETS,
       }
     ) => {
-      await initDownstreamService(
-        downstreamPort, downstreamHost, nSockets
-      );
+      if (downstreamHost && downstreamPort) {
+        console.log("initializing downstream connection...");
+        await initDownstreamService(
+          downstreamPort, downstreamHost, nSockets
+        );
+      } else {
+        console.log("NOT initializing downstream connection");
+      }
       const rootHandler = RootHandler(routes.list());
       const server = Server(rootHandler);
       return server.run(listenPort);
