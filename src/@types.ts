@@ -3,6 +3,7 @@ import http from "http";
 
 export interface Req extends http.IncomingMessage {
   body?: any;
+  qParams?: any;
 };
 export type Res = http.ServerResponse;
 // a CB can return null to stop the handle flow

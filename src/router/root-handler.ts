@@ -1,6 +1,7 @@
 /**
  * This defines the top level route handler
  */
+import querystring from "querystring";
 import url from "url";
 import fp from "lodash/fp";
 
@@ -38,6 +39,9 @@ export const RootHandler = (
         || getOtherwiseHandlers();
       if (!handlers) {
         return textRespond({res, status: 404, body: "Not Found"});
+      }
+      if (urlParts.query) {
+        req.qParams = querystring.parse(urlParts.query);
       }
       // This establishes the middleware flow.
       // Imperative to allow early breaks.

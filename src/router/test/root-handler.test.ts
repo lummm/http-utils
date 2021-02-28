@@ -14,6 +14,14 @@ describe("root-handler", () => {
       method: "POST",
       cbs: [async (req: any, res: any) => textRespond({ res, body: "2" })],
     },
+    {
+      path: "/with-query",
+      method: "GET",
+      cbs: [async (req: any, res: any) => {
+        const hiFromQuery = req.qParams.hi;
+        return textRespond({ res, body: hiFromQuery });
+      }],
+    },
   ];
   const rootHandler = RootHandler(routeDefs);
   const getMockReq = (method: string, url: string): any => ({
@@ -73,5 +81,12 @@ describe("root-handler", () => {
     expect(mockRes.write).toHaveBeenCalledWith("test");
     await rootHandlerWithDefault(mockReq2, mockRes);
     expect(mockRes.write).toHaveBeenCalledWith("test2");
+  });
+
+  it("should parse query params", async () => {
+    const mockReq = getMockReq("GET", "/with-query?hi=100");
+    const mockRes = getMockRes();
+    await rootHandler(mockReq, mockRes);
+    expect(mockRes.write).toHaveBeenCalledWith("100");
   });
 });
