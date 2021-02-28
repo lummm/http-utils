@@ -26,6 +26,10 @@ export interface RoutesDefApi {
   POST: RouteDefiner,
   PUT: RouteDefiner,
   list: () => RouteConf[],
+  otherwise: (
+    // specfiy a handler in case of no match elsewhere
+    handler: (method: string, path: string) => CB[],
+  ) => void;
 }
 
 
