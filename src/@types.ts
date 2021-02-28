@@ -7,7 +7,11 @@ export interface Req extends http.IncomingMessage {
 };
 export type Res = http.ServerResponse;
 // a CB can return null to stop the handle flow
-export type CB = (req: Req, res: Res) => Promise<[Req, Res] | void | null>;
+export type CB = (
+  req: Req,
+  res: Res,
+  parsedUrl?: UrlWithParsedQuery // for compat with express-style handlers
+) => Promise<[Req, Res] | void | null>;
 
 export type DefaultHandler = (method?: string, path?: string) => CB[];
 

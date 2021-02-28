@@ -2,7 +2,7 @@
  * This defines the top level route handler
  */
 import querystring from "querystring";
-import url from "url";
+import url, { UrlWithParsedQuery } from "url";
 import fp from "lodash/fp";
 
 import { RouteConf, CB, Req, Res, DefaultHandler } from "../@types";
@@ -31,6 +31,11 @@ export const RootHandler = (
         return
       }
       const urlParts = url.parse(req.url || "");
+      const parsedUrlQuery: UrlWithParsedQuery | undefined = urlParts.query && {
+        ...urlParts,
+        query: querystring.parse(urlParts.query),
+      } as any;
+      req.qParams = parsedUrlQuery?.query;
       const method = req.method || "";
       const path = urlParts.pathname || "";
       const key = `${path}.${method}`;
@@ -40,15 +45,13 @@ export const RootHandler = (
       if (!handlers) {
         return textRespond({res, status: 404, body: "Not Found"});
       }
-      if (urlParts.query) {
-        req.qParams = querystring.parse(urlParts.query);
-      }
+
       // This establishes the middleware flow.
       // Imperative to allow early breaks.
       let workingReq = req;
       let workingRes = res;
       for (let handler of handlers) {
-        const stepResult = await handler(workingReq, workingRes);
+        const stepResult = await handler(workingReq, workingRes, parsedUrlQuery);
         if (!stepResult) {
           // we terminate early
           break;
