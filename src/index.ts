@@ -26,7 +26,7 @@ export const App = () => {
       } else {
         console.log("NOT initializing downstream connection");
       }
-      const rootHandler = RootHandler(routes.list());
+      const rootHandler = RootHandler(routes.list(), routes.otherwise);
       const server = Server(rootHandler);
       return server.run(listenPort);
     },

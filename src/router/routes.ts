@@ -10,11 +10,8 @@ export const Routes = (): RoutesDefApi => {
     };
     return acc;
   }, {} as any);
-  let defaultHandler = null;
-  const otherwise = (handler: any) => defaultHandler = handler;
   return {
     ...api,
     list: () => routes,
-    otherwise,
   };
 };

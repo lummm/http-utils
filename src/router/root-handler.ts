@@ -4,7 +4,7 @@
 import url from "url";
 import fp from "lodash/fp";
 
-import { RouteConf, CB, Req, Res } from "../@types";
+import { RouteConf, CB, Req, Res, DefaultHandler } from "../@types";
 import { Method } from "../constants";
 import { textRespond } from "../response";
 
@@ -17,7 +17,8 @@ interface RouteLookup {
 
 
 export const RootHandler = (
-  routes: RouteConf[]
+  routes: RouteConf[],
+  otherwise?: DefaultHandler,
 ): CB => {
   const routeLookup: RouteLookup = routes.reduce(
     (acc, {path, method, cbs}) => fp.set([path, method], cbs)(acc),
@@ -29,10 +30,14 @@ export const RootHandler = (
         return
       }
       const urlParts = url.parse(req.url || "");
-      const key = `${urlParts.pathname}.${req.method}`;
-      const handlers: CB[] = fp.get(key)(routeLookup);
+      const method = req.method || "";
+      const path = urlParts.pathname || "";
+      const key = `${path}.${method}`;
+      const getOtherwiseHandlers = () => otherwise && otherwise(method, path);
+      const handlers: CB[] = fp.get(key)(routeLookup)
+        || getOtherwiseHandlers();
       if (!handlers) {
-        return textRespond({res, status: 401, body: "Not Found"});
+        return textRespond({res, status: 404, body: "Not Found"});
       }
       // This establishes the middleware flow.
       // Imperative to allow early breaks.

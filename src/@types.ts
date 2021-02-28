@@ -8,6 +8,8 @@ export type Res = http.ServerResponse;
 // a CB can return null to stop the handle flow
 export type CB = (req: Req, res: Res) => Promise<[Req, Res] | void | null>;
 
+export type DefaultHandler = (method?: string, path?: string) => CB[];
+
 export type RouteConf = {
   path: string;
   method: string;
@@ -22,14 +24,12 @@ type RouteDefiner = (
 ) => void;
 
 export interface RoutesDefApi {
-  GET: RouteDefiner,
-  POST: RouteDefiner,
-  PUT: RouteDefiner,
-  list: () => RouteConf[],
-  otherwise: (
-    // specfiy a handler in case of no match elsewhere
-    handler: (method: string, path: string) => CB[],
-  ) => void;
+  GET: RouteDefiner;
+  POST: RouteDefiner;
+  PUT: RouteDefiner;
+  list: () => RouteConf[];
+  // specfiy a handler in case of no match elsewhere
+  otherwise?: DefaultHandler;
 }
 
 

@@ -3,18 +3,19 @@ import { textRespond } from "../../response";
 
 
 describe("root-handler", () => {
-  const rootHandler = RootHandler([
+  const routeDefs = [
     {
       path: "/test-1",
       method: "GET",
-      cbs: [async (req, res) => textRespond({res, body: "1"})],
+      cbs: [async (req: any, res: any) => textRespond({ res, body: "1" })],
     },
     {
       path: "/test-2",
       method: "POST",
-      cbs: [async (req, res) => textRespond({res, body: "2"})],
+      cbs: [async (req: any, res: any) => textRespond({ res, body: "2" })],
     },
-  ]);
+  ];
+  const rootHandler = RootHandler(routeDefs);
   const getMockReq = (method: string, url: string): any => ({
     url,
     method,
@@ -45,11 +46,32 @@ describe("root-handler", () => {
     expect(status).toEqual(200);
   });
 
-  it("should return 401 if a handler isn't found", async () => {
+  it("should return 404 if a handler isn't found", async () => {
     const mockReq = getMockReq("GET", "/nope");
     const mockRes = getMockRes();
     await rootHandler(mockReq, mockRes);
     const [status, _headers] = mockRes.writeHead.mock.calls[0];
-    expect(status).toEqual(401);
+    expect(status).toEqual(404);
+  });
+
+  it("should use the 'otherwise' function if it is provided", async () => {
+    const defaultHandler = (method?: string, path?: string) => {
+      if (path === "/nope") {
+        return [
+          async (req: any, res: any) => textRespond({ res, body: "test" }),
+        ];
+      }
+      return [
+        async (req: any, res: any) => textRespond({ res, body: "test2" }),
+      ];
+    }
+    const rootHandlerWithDefault = RootHandler(routeDefs, defaultHandler);
+    const mockReq = getMockReq("GET", "/nope");
+    const mockReq2 = getMockReq("GET", "/nope-2");
+    const mockRes = getMockRes();
+    await rootHandlerWithDefault(mockReq, mockRes);
+    expect(mockRes.write).toHaveBeenCalledWith("test");
+    await rootHandlerWithDefault(mockReq2, mockRes);
+    expect(mockRes.write).toHaveBeenCalledWith("test2");
   });
 });
