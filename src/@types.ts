@@ -27,3 +27,17 @@ export interface RoutesDefApi {
   PUT: RouteDefiner,
   list: () => RouteConf[],
 }
+
+
+// permissioning
+export type AgentId = string;
+export type ObjectId = string;
+export enum PermissionRelation {
+  OWNS = "OWNS",
+};
+export interface PermissionEvalutaationArgs {
+  agentId: AgentId;
+  objectId: ObjectId;
+  relation: PermissionRelation;
+}
+export type PermissionEvaluator = (evaluationArgs: PermissionEvalutaationArgs)  => Promise<boolean>;

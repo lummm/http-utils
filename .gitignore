@@ -3,3 +3,5 @@ lib/
 
 test/requests.txt
 test/responses.txt
+
+.log/
