@@ -5,6 +5,7 @@ import url from "url";
 export interface Req extends http.IncomingMessage {
   body?: any;
   qParams?: any;
+  userId?: string;
 };
 export type Res = http.ServerResponse;
 // a CB can return null to stop the handle flow

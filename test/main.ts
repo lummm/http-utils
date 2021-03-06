@@ -1,8 +1,29 @@
-import { App, jsonRespond, Downstream, readBody } from "http-utils";
+import { App, jsonRespond, Downstream, readBody, Auth } from "http-utils";
 import { Req, Res } from "http-utils/lib/@types";
 
 
 const app = App();
+
+
+app.routes.GET(
+  "/test-auth",
+  Auth.ensureAuthenticated,
+  async (req: Req, res: Res) => {
+    return jsonRespond({res, body: "OK"});
+  });
+
+app.routes.POST(
+  "/test-auth",
+  async (req: Req, res: Res) => {
+    console.log("in here");
+    const token = await Auth.issueToken("12345")
+    return jsonRespond({
+      res,
+      body: {
+        token,
+      }
+    });
+  });
 
 
 app.routes.GET(

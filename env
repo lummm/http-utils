@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export KEY="testing-key"
+export LISTEN=8888
+export DS=9999
