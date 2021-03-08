@@ -73,7 +73,7 @@ describe("root-handler", () => {
         async (req: any, res: any) => textRespond({ res, body: "test2" }),
       ];
     }
-    const rootHandlerWithDefault = RootHandler(routeDefs, defaultHandler);
+    const rootHandlerWithDefault = RootHandler(routeDefs, undefined, defaultHandler);
     const mockReq = getMockReq("GET", "/nope");
     const mockReq2 = getMockReq("GET", "/nope-2");
     const mockRes = getMockRes();
@@ -89,4 +89,5 @@ describe("root-handler", () => {
     await rootHandler(mockReq, mockRes);
     expect(mockRes.write).toHaveBeenCalledWith("100");
   });
+
 });

@@ -16,6 +16,11 @@ export type CB = (
 ) => Promise<[Req, Res] | void | null>;
 
 export type DefaultHandler = (method?: string, path?: string) => CB[];
+export type ErrorHandler = (
+  error: Error,
+  req: Req,
+  res: Res,
+) => Promise<void>;
 
 export type RouteConf = {
   path: string;
@@ -37,6 +42,7 @@ export interface RoutesDefApi {
   list: () => RouteConf[];
   // specfiy a handler in case of no match elsewhere
   otherwise?: DefaultHandler;
+  errorHandler?: ErrorHandler;
 }
 
 

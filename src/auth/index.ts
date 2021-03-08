@@ -67,7 +67,8 @@ const ensureAuthenticated: CB = async (
   }
   try {
     const { userId } = await parseToken(authToken);
-    return [{...req, userId} as Req, res];
+    req.userId = userId;
+    return [req, res];
   } catch (e) {
     console.error(e);
     return respondUnauthorized();

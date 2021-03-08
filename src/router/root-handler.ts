@@ -5,7 +5,7 @@ import querystring from "querystring";
 import url, { UrlWithParsedQuery } from "url";
 import fp from "lodash/fp";
 
-import { RouteConf, CB, Req, Res, DefaultHandler } from "../@types";
+import { RouteConf, CB, Req, Res, DefaultHandler, ErrorHandler } from "../@types";
 import { Method } from "../constants";
 import { textRespond } from "../response";
 
@@ -19,6 +19,7 @@ interface RouteLookup {
 
 export const RootHandler = (
   routes: RouteConf[],
+  errorHandler?: ErrorHandler,
   otherwise?: DefaultHandler,
 ): CB => {
   const routeLookup: RouteLookup = routes.reduce(
@@ -59,6 +60,10 @@ export const RootHandler = (
         [workingReq, workingRes] = stepResult;
       }
     } catch (e) {
+      if (errorHandler) {
+        return errorHandler(e, req, res);
+      }
+      // default error handling
       console.trace(e);
       return textRespond({res, status: 500, body: "Server Error"});
     }
