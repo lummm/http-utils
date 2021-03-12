@@ -38,5 +38,4 @@ export const App = () => {
 export { textRespond, jsonRespond } from "./response";
 export { Downstream, runBridge } from "./downstream";
 export { readBody } from "./request";
-import auth from "./auth";
-export const Auth = auth;
+export { Auth } from "./auth";

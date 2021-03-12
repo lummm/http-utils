@@ -50,5 +50,5 @@ export const readBody = ({
       return textRespond({res, status: 400, body: errMsg});
     }
   }
-  return [{...req, body} as Req, res];
+  return {req: {...req, body} as Req, res};
 };

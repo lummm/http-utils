@@ -13,7 +13,7 @@ export type CB = (
   req: Req,
   res: Res,
   parsedUrl?: url.UrlWithParsedQuery // for compat with express-style handlers
-) => Promise<[Req, Res] | void | null>;
+) => Promise<{req: Req, res: Res} | void | null>;
 
 export type DefaultHandler = (method?: string, path?: string) => CB[];
 export type ErrorHandler = (
@@ -58,3 +58,9 @@ export interface PermissionEvalutaationArgs {
   relation: PermissionRelation;
 }
 export type PermissionEvaluator = (evaluationArgs: PermissionEvalutaationArgs)  => Promise<boolean>;
+
+export interface RefreshTokenMgr {
+  lookup: (token: string) => Promise<string>;
+  invalidate: (token: string) => Promise<void>;
+  issue: (identity: string) => Promise<string>;
+}

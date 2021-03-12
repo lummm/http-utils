@@ -57,7 +57,8 @@ export const RootHandler = (
           // we terminate early
           break;
         }
-        [workingReq, workingRes] = stepResult;
+        workingRes = stepResult.res;
+        workingReq = stepResult.req;
       }
     } catch (e) {
       if (errorHandler) {

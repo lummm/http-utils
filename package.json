@@ -9,6 +9,7 @@
     "postinstall": "npm run build",
     "clean": "rm -rf ./lib",
     "test": "jest",
+    "typecheck": "tsc --noEmit",
     "tdd": "jest --watchAll"
   },
   "keywords": [],

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
-import { Req, Res, CB } from "../@types";
+import { Req, Res, CB, RefreshTokenMgr } from "../@types";
 import { textRespond } from "../response";
+import { cookieService } from "../cookieService";
 
 
 const key = process.env["KEY"] as string;
@@ -8,6 +9,9 @@ const key = process.env["KEY"] as string;
 const bearerRegex = /Bearer (.+)/;
 
 const algorithm = "HS512";
+// this is ok if we can restrict the domain,
+// o/w the mgr needs to provide the key
+const REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
 
 
 const issueToken = (
@@ -44,12 +48,14 @@ const parseToken = (
   });
 }
 
-const ensureAuthenticated: CB = async (
+const ensureAuthenticated = (
+  refreshTokenMgr: RefreshTokenMgr,
+): CB => async (
   req: Req,
   res: Res,
 ) => {
   const authHeader = req.headers["authorization"];
-  const respondUnauthorized = () => {
+  function respondUnauthorized() {
     textRespond({
       res,
       status: 401,
@@ -57,25 +63,54 @@ const ensureAuthenticated: CB = async (
     });
     return null;
   };
+  async function resortToRefreshToken() {
+    const refreshToken = cookieService.getCookies(req)[REFRESH_TOKEN_KEY];
+    const userId = await refreshTokenMgr.lookup(refreshToken);
+    if (!userId) {
+      return respondUnauthorized();
+    }
+    await refreshTokenMgr.invalidate(refreshToken);
+    return initSession({req, res}, userId, refreshTokenMgr);
+  }
   if (!authHeader) {
-    return respondUnauthorized();
+    return resortToRefreshToken();
   }
   const match = bearerRegex.exec(authHeader as string);
   const authToken = match && match[1];
   if (!authToken){
-    return respondUnauthorized();
+    return resortToRefreshToken();
   }
   try {
     const { userId } = await parseToken(authToken);
     req.userId = userId;
-    return [req, res];
+    return {req, res};
   } catch (e) {
     console.error(e);
-    return respondUnauthorized();
+    return resortToRefreshToken();
   }
 }
 
-export default {
+async function initSession(
+  {
+    req, res
+  }: { req: Req, res: Res },
+  userId: string,
+  refreshTokenMgr: RefreshTokenMgr,
+) {
+  const sessionToken = await issueToken(userId);
+  const refreshToken = await refreshTokenMgr.issue(userId);
+  cookieService.setCookie(res, REFRESH_TOKEN_KEY, refreshToken, {
+    httpOnly: true,
+    path: "/",
+  });
+  res.setHeader(
+    "set-session", sessionToken
+  );
+  return {req, res};
+}
+
+export const Auth = {
+  initSession,
   issueToken,
   ensureAuthenticated,
 };
