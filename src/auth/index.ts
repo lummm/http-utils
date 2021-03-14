@@ -12,6 +12,7 @@ const algorithm = "HS512";
 // this is ok if we can restrict the domain,
 // o/w the mgr needs to provide the key
 const REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
+const SESSION_TOKEN_KEY = "SESSION_TOKEN"
 
 
 const issueToken = (
@@ -54,7 +55,8 @@ const ensureAuthenticated = (
   req: Req,
   res: Res,
 ) => {
-  const authHeader = req.headers["authorization"];
+  const cookies = cookieService.getCookies(req);
+  const authToken = cookies[SESSION_TOKEN_KEY];
   function respondUnauthorized() {
     textRespond({
       res,
@@ -64,7 +66,7 @@ const ensureAuthenticated = (
     return null;
   };
   async function resortToRefreshToken() {
-    const refreshToken = cookieService.getCookies(req)[REFRESH_TOKEN_KEY];
+    const refreshToken = cookies[REFRESH_TOKEN_KEY];
     const userId = await refreshTokenMgr.lookup(refreshToken);
     if (!userId) {
       return respondUnauthorized();
@@ -72,11 +74,6 @@ const ensureAuthenticated = (
     await refreshTokenMgr.invalidate(refreshToken);
     return initSession({req, res}, userId, refreshTokenMgr);
   }
-  if (!authHeader) {
-    return resortToRefreshToken();
-  }
-  const match = bearerRegex.exec(authHeader as string);
-  const authToken = match && match[1];
   if (!authToken){
     return resortToRefreshToken();
   }
@@ -103,9 +100,10 @@ async function initSession(
     httpOnly: true,
     path: "/",
   });
-  res.setHeader(
-    "set-session", sessionToken
-  );
+  cookieService.setCookie(res, SESSION_TOKEN_KEY, sessionToken, {
+    httpOnly: true,
+    path: "/",
+  });
   return {req, res};
 }
 
