@@ -25,7 +25,6 @@ const getBodyJson = async (req: Req) => JSON.parse(
   await getBodyStr(req)
 );
 
-
 export const readBody = ({
   asJson = true,
   ensureKeys = [],
@@ -36,9 +35,16 @@ export const readBody = ({
   req: Req,
   res: Res,
 ) => {
-  const body = asJson
-    ? await getBodyJson(req)
-    : await getBodyStr(req);
+  let body;
+  try {
+    body = asJson
+      ? await getBodyJson(req)
+      : await getBodyStr(req);
+  } catch (e) {
+    console.error(e);
+    return textRespond({res, status: 400, body: "no body"})
+  }
+
   if (asJson && ensureKeys.length) {
     const missingKeys = fp.difference(ensureKeys)(Object.keys(body));
     if (missingKeys.length) {
