@@ -107,8 +107,17 @@ async function initSession(
   return {req, res};
 }
 
+async function logout({
+  req, res
+}: { req: Req, res: Res }) {
+  cookieService.setCookie(res, REFRESH_TOKEN_KEY, "", {});
+  cookieService.setCookie(res, SESSION_TOKEN_KEY, "", {});
+  return { req, res };
+}
+
 export const Auth = {
   initSession,
   issueToken,
   ensureAuthenticated,
+  logout,
 };
