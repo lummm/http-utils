@@ -24,6 +24,8 @@ function setCookie(
     domain?: string,
     path?: string,
     httpOnly?: boolean,
+    expires?: number,
+    maxAgeS?: number,
   },
 ) {
   const encodedVal = encodeURIComponent(val);
@@ -36,6 +38,12 @@ function setCookie(
       : "") +
     (opts.httpOnly
       ? `; HttpOnly`
+      : "") +
+    (opts.expires
+      ? `; Expires=${(new Date(opts.expires)).toUTCString()}`
+      : "") +
+    (opts.maxAgeS
+      ? `; Max-Age=${opts.maxAgeS}`
       : "")
   ;
   res.setHeader("Set-Cookie", cookieVal);

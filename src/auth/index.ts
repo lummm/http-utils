@@ -110,8 +110,16 @@ async function initSession(
 async function logout({
   req, res
 }: { req: Req, res: Res }) {
-  cookieService.setCookie(res, REFRESH_TOKEN_KEY, "", {});
-  cookieService.setCookie(res, SESSION_TOKEN_KEY, "", {});
+  cookieService.setCookie(res, REFRESH_TOKEN_KEY, "unset", {
+    httpOnly: true,
+    maxAgeS: -1,
+    path: "/",
+  });
+  cookieService.setCookie(res, SESSION_TOKEN_KEY, "unset", {
+    httpOnly: true,
+    maxAgeS: -1,
+    path: "/",
+  });
   return { req, res };
 }
 
