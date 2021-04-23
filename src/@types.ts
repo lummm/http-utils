@@ -60,7 +60,7 @@ export interface PermissionEvalutaationArgs {
 export type PermissionEvaluator = (evaluationArgs: PermissionEvalutaationArgs)  => Promise<boolean>;
 
 export interface RefreshTokenMgr {
-  lookup: (token: string) => Promise<string>;
+  lookup: (token: string) => Promise<string | null>;
   invalidate: (token: string) => Promise<void>;
   issue: (identity: string) => Promise<string>;
 }
