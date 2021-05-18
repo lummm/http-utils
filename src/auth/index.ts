@@ -4,7 +4,7 @@ import { textRespond } from "../response";
 import { cookieService } from "../cookieService";
 
 
-const key = process.env["KEY"] as string;
+let signKey: string = "test-key";
 
 const bearerRegex = /Bearer (.+)/;
 
@@ -22,7 +22,7 @@ const issueToken = (
   const exp = (Date.now() / 1000) + expSeconds;
   return new Promise((resolve, reject) => jwt.sign(
     { userId },
-    key,
+    signKey,
     { algorithm },
     (err, token) => {
       if (err) {
@@ -37,7 +37,7 @@ const parseToken = (
   token: string,
 ): Promise<{userId: string}> => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, key, (err, decoded) => {
+    jwt.verify(token, signKey, (err, decoded) => {
       if (err) {
         return reject(err);
       }
@@ -123,9 +123,12 @@ async function logout({
   return { req, res };
 }
 
+const setSignKey = (key: string) => signKey = key;
+
 export const Auth = {
   initSession,
   issueToken,
   ensureAuthenticated,
   logout,
+  setSignKey,
 };
