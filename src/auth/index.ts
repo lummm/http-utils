@@ -4,7 +4,7 @@ import { textRespond } from "../response";
 import { cookieService } from "../cookieService";
 
 
-let signKey: string = "test-key";
+let signKey: Buffer = Buffer.from("test-key");
 
 const bearerRegex = /Bearer (.+)/;
 
@@ -123,7 +123,7 @@ async function logout({
   return { req, res };
 }
 
-const setSignKey = (key: string) => signKey = key;
+const setSignKey = (key: Buffer) => signKey = key;
 
 export const Auth = {
   initSession,
