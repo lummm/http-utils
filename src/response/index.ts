@@ -1,11 +1,16 @@
 import { ResponseType, Res } from "../@types";
 
 
+const CONTENT_TYPE_MAP = {
+  json: "application/json",
+  text: "text/plain",
+  xml: "text/xml",
+}
+
 const getResponseHeaders = (
   responseType: ResponseType,
 ) => ({
-  "Content-type": responseType === "json" ?
-    "application/json" : "text/plain",
+  "Content-type": CONTENT_TYPE_MAP[responseType],
 });
 
 const getResBody = (
@@ -36,3 +41,4 @@ const respond = (
 
 export const textRespond = respond("text");
 export const jsonRespond = respond("json");
+export const xmlRespond = respond("xml");

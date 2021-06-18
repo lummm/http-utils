@@ -28,7 +28,7 @@ export type RouteConf = {
   cbs: CB[];
 };
 
-export type ResponseType = "json" | "text"
+export type ResponseType = "json" | "text" | "xml";
 
 type RouteDefiner = (
   path: string,
